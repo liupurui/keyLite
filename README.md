@@ -29,15 +29,29 @@ Rust 内核 + Tauri 2 桌面端 + Chrome MV3 扩展
 
 ## 界面
 
-7 屏高保真设计稿在 [`docs/mockups.html`](docs/mockups.html)，用浏览器直接打开即可（1:1 真实像素）：
+**密码库主界面** —— 分类 / 条目 / 详情三栏，域名首字母色块做识别
 
-```bash
-open docs/mockups.html
-```
+<img src="docs/screens/02-vault.png" width="900" alt="密码库主界面">
 
-包含：解锁 / 密码库主界面 / 新增条目 / 快速搜索 / 浏览器右键一键登录 / 保存提示 / 设置。
+<table>
+<tr>
+<td width="50%"><b>解锁</b><br>主密码 + 触控 ID 双入口<br><img src="docs/screens/01-unlock.png" width="320" alt="解锁"></td>
+<td width="50%"><b>快速搜索 ⌘⇧Space</b><br>↑↓ 选择、↵ 复制密码<br><img src="docs/screens/04-quick-search.png" width="380" alt="快速搜索"></td>
+</tr>
+<tr>
+<td><b>浏览器右键 · 一键登录</b><br>按站点过滤，按最近使用排序<br><img src="docs/screens/05-context-menu.png" width="420" alt="右键一键登录"></td>
+<td><b>保存提示</b><br>提交后自动保存，6 秒内可撤销<br><img src="docs/screens/06-save-prompt.png" width="380" alt="保存提示"></td>
+</tr>
+<tr>
+<td><b>新增条目</b><br>密码框右侧直接给生成入口<br><img src="docs/screens/03-new-item.png" width="340" alt="新增条目"></td>
+<td><b>设置</b><br>保存方式、触控 ID、菜单栏、清空密码库<br><img src="docs/screens/07-settings.png" width="340" alt="设置"></td>
+</tr>
+</table>
 
-导出为 PNG（需要本机 Chrome）：
+完整设计板：[`docs/screens/00-all-screens.png`](docs/screens/00-all-screens.png)　｜　
+可交互原型：[`docs/mockups.html`](docs/mockups.html)（浏览器直接打开，1:1 真实像素）
+
+重新导出（需要本机 Chrome）：
 
 ```bash
 bash scripts/shoot.sh   # 产物在 docs/screens/
