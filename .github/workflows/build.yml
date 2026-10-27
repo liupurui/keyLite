@@ -45,8 +45,9 @@ jobs:
       - name: 类型检查与构建
         run: cd app && npx tsc --noEmit && npx vite build
 
-  # macOS 打包：产出 .app / .dmg
-  macos:
+  # 日常提交：只验证 macOS 能打包，产物留作 artifact
+  bundle:
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     runs-on: macos-latest
     needs: check
     steps:
@@ -86,7 +87,67 @@ jobs:
             app/src-tauri/target/release/bundle/dmg/*.dmg
           if-no-files-found: warn
 
-  # 说明：Windows 目标暂未纳入。
-  # 代码里有 4 处 macOS/Unix 绑定（Unix socket IPC、LAContext 触控 ID、
-  # 钥匙串、RunEvent::Reopen），需要先做平台适配才能编译，
-  # 详见 docs/PRODUCT.md「已知限制」。
+  # 打 tag（v*）时：构建并创建 GitHub Release，挂上 .dmg
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-latest
+    needs: check
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 缓存 cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-release-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: 前端依赖
+        run: cd app && npm ci
+
+      - name: 安装双架构目标（打通用二进制）
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: 构建并发布 Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: app
+          args: --target universal-apple-darwin
+          tagName: ${{ github.ref_name }}
+          releaseName: "密钥库 Keylite ${{ github.ref_name }}"
+          releaseDraft: true
+          prerelease: false
+          releaseBody: |
+            ## 密钥库 Keylite ${{ github.ref_name }}
+
+            macOS 上本地优先的账号密码管理工具。数据只存在本机，密码字段 AES-256-GCM 加密，主密码不落盘。
+
+            ### 下载
+            `Keylite_*_universal.dmg` —— 通用二进制，Apple 芯片与 Intel 都能跑
+
+            ### 安装
+            1. 打开 dmg，把 Keylite 拖进「应用程序」
+            2. **首次打开需右键 → 打开**（当前为 ad-hoc 签名，未经 Apple 公证）
+            3. 创建主密码，开始使用
+
+            ### 浏览器扩展
+            扩展需单独加载，详见仓库 `extension/README.md`。
+
+            > 未签名说明：本项目尚未申请 Apple Developer ID 证书，因此系统会提示「无法验证开发者」。
+            > 你可以在「系统设置 → 隐私与安全性」中放行，或自行从源码构建。

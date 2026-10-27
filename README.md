@@ -10,6 +10,15 @@ Rust 内核 + Tauri 2 桌面端 + Chrome MV3 扩展
 打包体积约 6.5 MB（Electron 同类应用通常 150 MB+）
 ```
 
+## 下载
+
+从 [Releases](https://github.com/liupurui/keyLite/releases) 下载 `Keylite_*_universal.dmg`
+（通用二进制，Apple 芯片与 Intel 都能跑）。
+
+> **首次打开需右键 → 打开**：项目尚未申请 Apple Developer ID 证书，未经 Apple 公证，
+> 系统会提示「无法验证开发者」。也可以在「系统设置 → 隐私与安全性」中放行，
+> 或者直接[从源码构建](#快速开始)。
+
 ---
 
 ## 为什么需要两个进程
