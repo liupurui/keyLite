@@ -150,18 +150,18 @@ function originOf(url: string): string {
 function seed() {
   const base = now();
   const raw: [string, string, string, string, number, string[]][] = [
-    ["GitHub", "https://github.com/login", "liupurui@me.com", "Kx7#mQ2!pR9$vL4&", 2 * 3600, ["工作", "开发"]],
-    ["Figma", "https://figma.com/login", "liupurui@me.com", "fG!8sQ2#wZ5^rT1m", 2 * 3600, ["工作"]],
-    ["Stripe 后台", "https://dashboard.stripe.com", "finance@keylite.dev", "St#9kL2$mP4^qR7w", 3 * 86400, ["工作", "金融"]],
-    ["支付宝", "https://alipay.com", "138****8123", "Ap!5nM8@kL2#vB6x", 7 * 86400, ["金融"]],
-    ["Notion", "https://notion.so", "liupurui@me.com", "Nt3$pQ7!vB2#wZ8m", 7 * 86400, ["工作"]],
-    ["阿里云", "https://aliyun.com", "liupurui@me.com", "Al9@kM3#nB7$vC2x", 14 * 86400, ["开发"]],
-    ["Vercel", "https://vercel.com/login", "dev@keylite.dev", "Vc4!nB8@mK2#pQ9w", 30 * 86400, ["开发"]],
-    ["Linear", "https://linear.app", "liupurui@me.com", "Ln6$vC2!bN8@mK4q", 30 * 86400, ["工作"]],
-    ["Cloudflare", "https://dash.cloudflare.com", "ops@keylite.dev", "Cf2#mQ9!vB4@nK7p", 60 * 86400, ["开发"]],
-    ["Slack", "https://keylite.slack.com", "liupurui@me.com", "Sl8@nK4#vB2!mQ6w", 60 * 86400, ["工作"]],
+    ["GitHub", "https://github.com/login", "demo@example.com", "Kx7#mQ2!pR9$vL4&", 2 * 3600, ["工作", "开发"]],
+    ["Figma", "https://figma.com/login", "demo@example.com", "fG!8sQ2#wZ5^rT1m", 2 * 3600, ["工作"]],
+    ["Stripe 后台", "https://dashboard.stripe.com", "finance@example.com", "St#9kL2$mP4^qR7w", 3 * 86400, ["工作", "金融"]],
+    ["支付宝", "https://alipay.com", "demo@example.com", "Ap!5nM8@kL2#vB6x", 7 * 86400, ["金融"]],
+    ["Notion", "https://notion.so", "demo@example.com", "Nt3$pQ7!vB2#wZ8m", 7 * 86400, ["工作"]],
+    ["阿里云", "https://aliyun.com", "demo@example.com", "Al9@kM3#nB7$vC2x", 14 * 86400, ["开发"]],
+    ["Vercel", "https://vercel.com/login", "dev@example.com", "Vc4!nB8@mK2#pQ9w", 30 * 86400, ["开发"]],
+    ["Linear", "https://linear.app", "demo@example.com", "Ln6$vC2!bN8@mK4q", 30 * 86400, ["工作"]],
+    ["Cloudflare", "https://dash.cloudflare.com", "ops@example.com", "Cf2#mQ9!vB4@nK7p", 60 * 86400, ["开发"]],
+    ["Slack", "https://example.slack.com", "demo@example.com", "Sl8@nK4#vB2!mQ6w", 60 * 86400, ["工作"]],
     ["微信公众平台", "https://mp.weixin.qq.com", "keylite2024", "Wx1!bN6@mK3#vC8q", 120 * 86400, ["工作"]],
-    ["AWS 控制台", "https://console.aws.amazon.com", "ops@keylite.dev", "1234", 150 * 86400, ["开发"]],
+    ["AWS 控制台", "https://console.aws.amazon.com", "ops@example.com", "1234", 150 * 86400, ["开发"]],
   ];
   rows = raw.map(([title, url, username, password, age, tags], i) => ({
     id: `demo-${i}`,

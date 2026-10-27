@@ -1,34 +1,78 @@
-# Keylite · 密钥库
+# 密钥库 · Keylite
 
-macOS 账号密码管理工具。**应用负责加密与存储，浏览器扩展负责识别网页、右键一键填充、提交后提示保存。**
-一个产品，两个进程，零云端，界面全中文。
+**macOS 上本地优先的账号密码管理工具。** 一个桌面应用 + 一个浏览器扩展，零云端。
 
-## 目录结构
+数据只存在你这台 Mac 上，密码字段用 AES-256-GCM 加密，主密码本身不落盘。
+浏览器里点进输入框就能看到本站账号，选中即填；提交登录后自动保存，网页上提示并可撤销。
 
 ```
-Keylite/
-├── Cargo.toml              # Rust 工作区
-├── core/                   # 纯 Rust 内核：加密 / 存储 / 生成器 / TOTP（31 个单测）
-│   └── src/{crypto,store,generator,totp,origin}.rs
-├── app/                    # Tauri 2 + React 19 界面
-│   ├── src/                # 解锁 / 密码库 / 新增条目 / 快速搜索 / 设置
-│   └── src-tauri/          # 命令层 + 扩展 IPC 通道 + keylite-host 桥
-├── extension/              # Chrome/Edge/Brave 扩展（MV3）
-├── docs/
-│   ├── DESIGN.md           # 设计方案（选型 / 加密 / 协议 / 里程碑）
-│   ├── mockups.html        # 7 屏 1:1 设计稿（浏览器直接打开）
-│   └── screens/            # 运行 scripts/shoot.sh 导出的 PNG
-└── scripts/                # 工具脚本（图标生成、设计稿截图）
+Rust 内核 + Tauri 2 桌面端 + Chrome MV3 扩展
+打包体积约 6.5 MB（Electron 同类应用通常 150 MB+）
 ```
+
+---
+
+## 为什么需要两个进程
+
+桌面应用**无法**读取浏览器里的网页内容——这是浏览器的安全沙箱，不是能力缺陷。
+所以「自动识别登录框、一键填充」只能由扩展完成，扩展再通过 Native Messaging 与本机应用通信。
+
+```
+┌──────────────────────────┐         ┌─────────────────────────────┐
+│  密钥库.app（Tauri）      │         │  密钥库扩展（Chrome MV3）    │
+│  ├ 主窗口 / 菜单栏图标    │◄───────►│  ├ 识别登录框                │
+│  ├ Rust 加密内核          │ Native  │  ├ 右键菜单 / 内联钥匙按钮   │
+│  ├ SQLite（密文）         │ Messa-  │  ├ 自动保存与页面内提示      │
+│  └ 触控 ID / 钥匙串       │ ging    │  └ 执行填充                  │
+└──────────────────────────┘         └─────────────────────────────┘
+```
+
+## 界面
+
+7 屏高保真设计稿在 [`docs/mockups.html`](docs/mockups.html)，用浏览器直接打开即可（1:1 真实像素）：
+
+```bash
+open docs/mockups.html
+```
+
+包含：解锁 / 密码库主界面 / 新增条目 / 快速搜索 / 浏览器右键一键登录 / 保存提示 / 设置。
+
+导出为 PNG（需要本机 Chrome）：
+
+```bash
+bash scripts/shoot.sh   # 产物在 docs/screens/
+```
+
+## 功能
+
+**桌面端**
+
+- 主密码解锁、**触控 ID 解锁**、⌘L 立即锁定、空闲自动锁定（可关）
+- 三栏主界面：分类 / 标签 / 条目列表 / 详情
+- 条目增删改、**内置 TOTP 两步验证码**（每秒刷新 + 倒计时）
+- 密码生成器（可配长度与字符类）
+- ⌘⇧Space 快速搜索，↑↓ 选择、↵ 复制密码
+- 复制密码后延迟清空剪贴板（只清自己复制的那次）
+- **菜单栏常驻**：关窗口不退出，浏览器扩展照常工作；图标可开关
+- 设置：保存方式、剪贴板、密码长度、菜单栏、清空密码库（主密码二次确认）
+
+**浏览器扩展**
+
+- **内联钥匙按钮**：点进账号或密码框，右侧浮出小钥匙，列出本站全部账号，选中即填
+- 右键子菜单填充（按最近使用排序）
+- **提交登录后自动保存**，页面右下角提示「已自动保存：站点」，6 秒内可撤销
+- 密码冲突不静默覆盖，页面弹「更新密码？/ 保持原样」
+- 兼容 React / Vue 受控输入；覆盖 form 提交、按钮点击、回车、整页跳转、SPA 清空字段
+- 防钓鱼：注册域（eTLD+1）严格匹配，`github.com.evil.cn` 拿不到 `github.com` 的条目
 
 ## 快速开始
 
-### 1. 只想看看界面（浏览器，不用编译 Rust）
+### 1. 只想看界面（浏览器，不编译 Rust）
 
 ```bash
 cd app && npm install && npm run dev
 # 打开 http://localhost:1420
-# 创建密码库 / 解锁时，mock 模式的主密码是：keylite
+# mock 模式主密码：keylite
 ```
 
 没有跑在 Tauri 里时自动使用内存 mock，界面完整可点，数据不落盘。
@@ -41,56 +85,95 @@ npm install
 npm run tauri dev     # 首次编译 Rust 约 3-8 分钟
 ```
 
-真机上数据落在 `~/Library/Application Support/dev.keylite.app/vault.db`，
-标题/网址/用户名明文便于搜索，密码、验证码、备注全部 AES-256-GCM 密文。
-
 ### 3. 打包
 
 ```bash
-cd app && npm run bundle      # 产出 .app 和 .dmg
+cd app && npm run tauri build
+# 产物：app/src-tauri/target/release/bundle/{macos,dmg}/
 ```
 
-## 浏览器扩展（右键一键填充）
+### 4. 装浏览器扩展
 
 ```bash
 # 1) Chrome → chrome://extensions → 开发者模式 → 加载已解压的扩展程序 → 选 extension/
-#    复制「扩展 ID」
+#    复制卡片上的扩展 ID
 # 2) 注册本机通道
 bash extension/install-host.sh <扩展ID>
-# 3) 启动桌面端并解锁 → 打开任意登录页 → 点进密码框 → 右键 → 密钥库
+# 3) 启动桌面端并解锁 → 打开任意登录页 → 点进密码框 → 右侧小钥匙
 ```
 
-详见 `extension/README.md`。
+详见 [`extension/README.md`](extension/README.md)。
 
-## 安全设计（v1 已实现）
+## 安全设计
 
-- 主密码 → Argon2id（m=64MiB, t=3, p=4）→ KEK → 解包 DEK → 每条记录 AES-256-GCM，AAD 绑定条目 id
-- 改主密码只重新封装 DEK，不需要重写全库；锁定即把内存中的 DEK 清零
-- 域名匹配用注册域（eTLD+1），`github.com.evil.cn` 匹配不到 `github.com` 的条目
-- 扩展取明文必须：已解锁 + 域名一致；未解锁只返回 `locked`
-- 复制密码后按设置延迟清空剪贴板（只清自己复制的那次）
-- 空闲自动锁定（默认关闭，可配 5/15/30/60 分钟；在浏览器里使用密钥库也算活动）
-- 触控 ID 解锁：DEK 副本存登录钥匙串，读取前必须通过 `LAContext` 指纹验证
-- 后台运行：关窗口只隐藏到菜单栏（进程继续跑，浏览器扩展照常工作）；
-  菜单栏图标可开关，图标关掉时关窗口即退出，避免应用找不回来
-- 单测覆盖：密文篡改检测、AAD 跨条目防搬运、落盘无明文、钓鱼域匹配
+```
+主密码 ──Argon2id(m=64MiB,t=3,p=4)──► KEK ──AES-GCM 解包──► DEK
+                                                            │
+                      每条记录 ──AES-256-GCM(DEK, 随机 nonce)──► 密文
+```
 
-## 里程碑
+- 主密码**不落盘**，只存 salt 与封装后的 DEK
+- 改主密码只重新封装 DEK，不重写全库；锁定即内存清零
+- 密文字段 AAD 绑定条目 id，防止密文在条目之间搬运
+- 扩展取明文要求「已解锁 + 站点一致」，且只能由白名单扩展 ID 调起
+- 项目代码中**没有任何网络请求**，数据不出本机
+
+**如实披露的边界**：标题、网址、域名、账号是明文存储（为了搜索速度），
+拿到数据库文件能看出注册过哪些网站、用什么账号，但**看不到任何密码**。
+完整的威胁模型与残余风险见 [`docs/PRODUCT.md`](docs/PRODUCT.md)。
+
+## 项目结构
+
+```
+Keylite/
+├── core/               Rust 内核：加密 / 存储 / 生成器 / TOTP / 域名归一化 / 扩展协议
+├── app/                Tauri 2 + React 19 桌面端
+│   ├── src/            界面
+│   └── src-tauri/      命令层、托盘、触控 ID、扩展 IPC 通道
+├── extension/          Chrome MV3 扩展 + Native Messaging 安装脚本
+├── docs/
+│   ├── DESIGN.md       技术方案与选型
+│   ├── PRODUCT.md      产品与技术说明（含用户体验、信息安全）
+│   ├── mockups.html    7 屏高保真设计稿
+│   └── screens/        shoot.sh 导出的 PNG
+└── scripts/            图标生成、设计稿导出
+```
+
+## 数据位置
+
+```
+~/Library/Application Support/dev.keylite.app/
+├── vault.db          条目、密文、KDF 参数、设置
+├── vault.db-wal      SQLite 预写日志
+├── ipc.sock          浏览器扩展通信通道（权限 0600）
+└── bin/keylite-host  扩展调起的桥程序
+```
+
+备份：拷走 `vault.db` 即可，换机器只要记得主密码。
+彻底卸载：删掉该目录 + `security delete-generic-password -s dev.keylite.app`。
+
+## 开发
+
+```bash
+cargo test -p keylite-core      # 内核单元测试（47 个）
+cd app && npx tsc --noEmit      # 前端类型检查
+node scripts/make-icons.mjs     # 重新生成应用图标
+bash scripts/shoot.sh           # 导出设计稿 PNG
+```
+
+## 状态
 
 | 阶段 | 内容 | 状态 |
 |---|---|---|
 | M0 | 设计方案 + 7 屏设计稿 | ✅ |
-| M1 | 加密内核、解锁、增删改查、生成器、TOTP、设置、快速搜索 | ✅ 本仓库 |
-| M2 | 浏览器扩展（识别 / 自动保存 / 右键与内联按钮填充 / 防钓鱼）、触控 ID 解锁 | ✅ |
-| M3 | Safari 扩展、深色主题、菜单栏常驻、导出备份 UI | ⏳ |
-| M4 | Windows / Linux（Tauri 同套代码） | ⏳ |
+| M1 | 加密内核、解锁、增删改查、生成器、TOTP、设置 | ✅ |
+| M2 | 浏览器扩展、自动保存、内联填充、防钓鱼、触控 ID、后台运行 | ✅ |
+| M3 | Safari 扩展、全局搜索独立窗口、深色主题 | ⏳ |
+| M4 | Windows / Linux 适配 | ⏳ |
 | M5 | 多设备端到端加密同步 | ⏳ |
 
-## 常用命令
+已知限制与后续规划见 [`docs/PRODUCT.md`](docs/PRODUCT.md) 第十节。
 
-```bash
-cargo test -p keylite-core      # 内核单测
-cd app && npm run build         # 前端类型检查 + 打包
-node scripts/make-icons.mjs     # 重新生成应用图标
-bash scripts/shoot.sh           # 导出设计稿 PNG
-```
+## 许可
+
+[MIT](LICENSE)

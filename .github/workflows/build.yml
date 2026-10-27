@@ -1,0 +1,92 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # 内核与前端类型检查：纯逻辑，跑在 Linux 上很快
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 缓存 cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: 内核单元测试
+        run: cargo test -p keylite-core
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: 前端依赖
+        run: cd app && npm ci
+
+      - name: 类型检查与构建
+        run: cd app && npx tsc --noEmit && npx vite build
+
+  # macOS 打包：产出 .app / .dmg
+  macos:
+    runs-on: macos-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 缓存 cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-bundle-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: 前端依赖
+        run: cd app && npm ci
+
+      - name: 打包（未签名，ad-hoc）
+        run: cd app && npx tauri build
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: Keylite-macos
+          path: |
+            app/src-tauri/target/release/bundle/macos/*.app
+            app/src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: warn
+
+  # 说明：Windows 目标暂未纳入。
+  # 代码里有 4 处 macOS/Unix 绑定（Unix socket IPC、LAContext 触控 ID、
+  # 钥匙串、RunEvent::Reopen），需要先做平台适配才能编译，
+  # 详见 docs/PRODUCT.md「已知限制」。

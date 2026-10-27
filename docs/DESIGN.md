@@ -143,7 +143,7 @@ items(
 ```json
 { "id": 1, "type": "save.candidate",
   "payload": { "url": "https://github.com/login", "origin": "github.com",
-               "username": "liupurui@me.com", "password": "…", "fromSubmit": true } }
+               "username": "demo@example.com", "password": "…", "fromSubmit": true } }
 ```
 
 App 弹出浮窗；用户点「保存」后 App 回写：
@@ -157,7 +157,7 @@ App 弹出浮窗；用户点「保存」后 App 回写：
 ```json
 { "type": "fill.query", "payload": { "origin": "github.com" } }
 → { "type": "fill.list", "payload": { "items": [
-      { "id": "it_8f21", "label": "liupurui@me.com", "lastUsed": "2026-10-25T09:12:00Z" } ] } }
+      { "id": "it_8f21", "label": "demo@example.com", "lastUsed": "2026-10-25T09:12:00Z" } ] } }
 ```
 
 点右键菜单项 → `fill.exec { itemId, origin }` → App 校验 origin 一致后返回明文 → content script 填充。
