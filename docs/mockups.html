@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>密钥库 · 界面设计稿 v0.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7FB;          /* 画布 */
+  --panel:#FFFFFF;       /* 面板 */
+  --ink:#0F172A;         /* 主文字 */
+  --muted:#64748B;       /* 次要文字 */
+  --line:#E2E8F0;        /* 分隔线 */
+  --line-2:#EEF2F7;      /* 浅分隔线 */
+  --blue:#2563EB;        /* 唯一强调色 */
+  --blue-d:#1D4ED8;
+  --blue-tint:#EFF6FF;   /* 选中底 */
+  --red:#BE123C;
+  --red-bg:#FFF1F2;
+  --green:#059669;
+  --amber:#B45309;
+  --ui:Inter,-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--ui);color:var(--ink);background:#E6EAF2;
+  background-image:radial-gradient(rgba(15,23,42,.06) 1px,transparent 1px);background-size:14px 14px;
+  padding:64px 72px 96px;display:flex;flex-direction:column;gap:60px;align-items:center;
+  -webkit-font-smoothing:antialiased;
+}
+svg.ic{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.board{display:flex;flex-direction:column;gap:14px}
+.cap{display:flex;align-items:baseline;gap:14px;padding-left:2px}
+.cap b{font:600 11px/1 var(--mono);letter-spacing:.14em;color:var(--blue)}
+.cap h2{font-size:15px;font-weight:700}
+.cap p{font-size:12.5px;color:#475569}
+.screen{
+  background:var(--bg);border-radius:14px;position:relative;overflow:hidden;
+  border:1px solid rgba(15,23,42,.08);
+  box-shadow:0 1px 2px rgba(15,23,42,.05),0 16px 40px -14px rgba(15,23,42,.22);
+}
+
+/* 通用原子 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 16px;
+  border-radius:10px;font-size:13px;font-weight:600;letter-spacing:.01em}
+.btn-p{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,.35),inset 0 1px 0 rgba(255,255,255,.16)}
+.btn-g{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.inp{height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;display:flex;align-items:center;
+  padding:0 12px;gap:8px;font-size:13px}
+.inp.focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+.ph{color:#94A3B8}
+.tgl{width:38px;height:22px;border-radius:12px;background:var(--blue);padding:3px;display:flex;justify-content:flex-end;flex:none}
+.tgl i{width:16px;height:16px;border-radius:50%;background:#fff;display:block;box-shadow:0 1px 2px rgba(15,23,42,.2)}
+.tgl.off{background:#CBD5E1;justify-content:flex-start}
+.av{display:flex;align-items:center;justify-content:center;background:var(--blue-tint);color:var(--blue);
+  font-family:var(--mono);font-weight:600;letter-spacing:.04em;flex:none}
+.kbd{font-family:var(--ui);font-size:10.5px;color:#94A3B8;border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:#fff}
+
+/* ========== 01 解锁 ========== */
+.lk{width:520px;height:580px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.lk .mark{width:46px;height:46px;border-radius:13px;background:var(--blue);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 16px -4px rgba(37,99,235,.45)}
+.lk h1{font-size:19px;font-weight:700;margin-top:20px;letter-spacing:.01em}
+.lk .sub{font-size:12px;color:var(--muted);margin-top:7px}
+.lk .form{width:300px;margin-top:28px;display:flex;flex-direction:column;gap:10px}
+.lk .btn{width:300px}
+.lk .or{display:flex;align-items:center;gap:10px;width:300px;margin:6px 0;color:#94A3B8;font-size:11px}
+.lk .or::before,.lk .or::after{content:"";height:1px;background:var(--line);flex:1}
+.lk .forgot{margin-top:18px;font-size:12px;color:var(--blue);font-weight:500}
+.lk .foot{position:absolute;bottom:26px;font-size:11px;color:#94A3B8;display:flex;align-items:center;gap:6px}
+
+/* ========== 02 主界面 ========== */
+.app{width:1060px;height:700px;display:flex;background:#fff}
+.sb{width:200px;flex:none;border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;background:#fff}
+.sb-brand{display:flex;align-items:center;gap:8px;padding:2px 6px 12px}
+.sb-brand .mark{width:22px;height:22px;border-radius:7px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex:none}
+.sb-brand b{font-size:13px;font-weight:700;letter-spacing:.01em}
+.sb-brand .add{margin-left:auto;width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:#fff;
+  display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.srch{height:32px;border-radius:8px;background:#F4F7FB;border:1px solid #E8EEF7;display:flex;align-items:center;gap:6px;
+  padding:0 9px;font-size:12px;color:#94A3B8}
+.srch .kbd{margin-left:auto;background:#fff}
+.sb-lab{font-size:10.5px;font-weight:600;color:#94A3B8;letter-spacing:.06em;padding:16px 8px 6px}
+.ni{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:8px;font-size:12.5px;color:var(--ink)}
+.ni .n{margin-left:auto;font-size:11px;color:#94A3B8;font-variant-numeric:tabular-nums}
+.ni.on{background:var(--blue-tint);color:var(--blue-d);font-weight:600}
+.ni.on .n{color:var(--blue);opacity:.65}
+.ni .dot{width:5px;height:5px;border-radius:50%;background:var(--amber);margin-left:auto}
+.ni .tg{width:6px;height:6px;border-radius:2px;flex:none}
+.sb-foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line-2)}
+.sb-stat{font-size:10.5px;color:#94A3B8;padding:0 8px 8px;display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+
+.list{width:320px;flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.lh{height:56px;flex:none;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--line);gap:8px}
+.lh .t{font-size:13px;font-weight:700}
+.lh .s{font-size:11px;color:#94A3B8;margin-top:2px}
+.lh .sort{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.rows{overflow:hidden}
+.row{height:56px;display:flex;align-items:center;gap:10px;padding:0 14px;position:relative;border-bottom:1px solid var(--line-2)}
+.row .av{width:28px;height:28px;border-radius:8px;font-size:10px}
+.row .av.g{background:#F1F5F9;color:#64748B}
+.row .nm{font-size:12.5px;font-weight:500}
+.row .dm{font-size:11px;color:#94A3B8;margin-top:2px}
+.row .tm{margin-left:auto;font-size:10.5px;color:#94A3B8;font-variant-numeric:tabular-nums}
+.row.sel{background:var(--blue-tint)}
+.row.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
+.row.sel .nm{font-weight:700;color:var(--blue-d)}
+
+.det{flex:1;display:flex;flex-direction:column;min-width:0}
+.dt-h{padding:22px 24px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+.dt-h .av{width:42px;height:42px;border-radius:11px;font-size:13px}
+.dt-h h3{font-size:18px;font-weight:700;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+.dt-h .url{font-size:12px;color:var(--blue);margin-top:4px;display:flex;align-items:center;gap:5px}
+.dt-h .acts{margin-left:auto;display:flex;gap:6px}
+.ib{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);background:#fff}
+.dt-b{flex:1;padding:4px 24px 0}
+.fld{padding:15px 0;border-bottom:1px solid var(--line-2)}
+.fld .lb{font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.v{display:flex;align-items:center;gap:10px;min-height:22px;font-size:13px}
+.v .mono{font-family:var(--mono);font-size:12.5px}
+.v .dots{font-family:var(--mono);font-size:17px;letter-spacing:2.5px;line-height:1}
+.v .cp{margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);flex:none}
+.hint{font-size:10.5px;color:#94A3B8}
+.tagok{font-size:10px;font-weight:600;color:var(--green);background:#ECFDF5;border-radius:20px;padding:2px 7px}
+.code{font-family:var(--mono);font-size:16px;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.ring{width:15px;height:15px;border-radius:50%;background:conic-gradient(var(--blue) 0 62%,var(--line) 62% 100%);
+  -webkit-mask:radial-gradient(circle 3.2px,transparent 98%,#000);mask:radial-gradient(circle 3.2px,transparent 98%,#000)}
+.meta{display:flex;gap:26px;padding:16px 0;margin-top:auto}
+.meta div{font-size:10.5px;color:#94A3B8}
+.meta div b{display:block;font-size:12px;font-weight:500;color:var(--ink);margin-top:3px;font-variant-numeric:tabular-nums}
+.dt-f{padding:12px 24px;border-top:1px solid var(--line);display:flex;gap:8px;background:#FBFCFE}
+.dt-f .btn{height:36px;font-size:12.5px}
+.dt-f .btn-g{padding:0 14px}
+
+/* ========== 03 新增条目 ========== */
+.mod-wrap{width:620px;height:600px;position:relative}
+.mod-bg{position:absolute;inset:0;background:linear-gradient(180deg,#EDF2F9,#F4F7FB)}
+.mod-bg .ghost{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(15,23,42,.05) 0 1px,transparent 1px 36px)}
+.mod-dim{position:absolute;inset:0;background:rgba(15,23,42,.20)}
+.mod{position:absolute;left:90px;top:24px;width:440px;height:552px;background:#fff;border-radius:14px;
+  box-shadow:0 24px 60px -16px rgba(15,23,42,.4);display:flex;flex-direction:column;overflow:hidden}
+.mod-h{padding:16px 20px 12px;display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.mod-h b{font-size:15px;font-weight:700}
+.mod-h .x{margin-left:auto;color:#94A3B8}
+.mod-b{padding:0 20px;flex:1}
+.mf{padding:9px 0}
+.mf .lb{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.mf .inp{height:34px;border-radius:8px;font-size:12.5px}
+.mf .inp.focus{box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.mf .gen{margin-left:auto;font-size:10.5px;color:var(--blue);font-weight:600}
+.mf textarea{width:100%;height:52px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12.5px;
+  font-family:var(--ui);color:var(--ink);resize:none;line-height:1.5}
+.chips{display:flex;gap:6px}
+.chip{height:24px;border-radius:12px;border:1px solid var(--line);font-size:11px;color:var(--muted);display:flex;align-items:center;padding:0 10px}
+.chip.on{background:var(--blue-tint);border-color:transparent;color:var(--blue-d);font-weight:600}
+.mod-f{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;background:#FBFCFE}
+.mod-f .btn{height:34px;font-size:12.5px}
+
+/* ========== 04 快速搜索 ========== */
+.qs{width:560px;height:302px;background:#fff;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 28px 60px -18px rgba(15,23,42,.4),0 2px 6px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
+.qs-i{height:48px;flex:none;display:flex;align-items:center;gap:9px;padding:0 15px;border-bottom:1px solid var(--line)}
+.qs-i .q{font-size:14px;font-weight:500}
+.caret{width:1.5px;height:16px;background:var(--blue);animation:bl 1.1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.qs-l{padding:6px}
+.qr{height:52px;border-radius:8px;display:flex;align-items:center;gap:10px;padding:0 10px}
+.qr .av{width:28px;height:28px;border-radius:8px;font-size:10px}
+.qr .nm{font-size:12.5px;font-weight:500}
+.qr .dm{font-size:11px;color:#94A3B8;margin-top:2px}
+.qr .ac{margin-left:auto;font-size:10.5px;color:#94A3B8}
+.qr.on{background:var(--blue);color:#fff}
+.qr.on .dm,.qr.on .ac{color:rgba(255,255,255,.7)}
+.qr.on .av{background:rgba(255,255,255,.18);color:#fff}
+.qs-f{margin-top:auto;height:32px;flex:none;display:flex;align-items:center;gap:14px;padding:0 15px;
+  border-top:1px solid var(--line);font-size:10.5px;color:#94A3B8;background:#FBFCFE}
+.qs-f b{font-weight:600;color:var(--muted)}
+.qs-f .grow{margin-left:auto}
+
+/* ========== 05 浏览器 + 右键菜单 ========== */
+.br{width:1160px;height:640px;display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(15,23,42,.08);box-shadow:0 16px 40px -14px rgba(15,23,42,.22)}
+.br-t{height:36px;flex:none;display:flex;align-items:flex-end;gap:0;padding:0 10px;background:#E8EDF5;border-bottom:1px solid #D9E0EA}
+.br-lt{display:flex;gap:7px;padding:0 12px 11px 2px}
+.br-lt i{width:11px;height:11px;border-radius:50%;display:block}
+.l1{background:#FF5F57}.l2{background:#FEBC2E}.l3{background:#28C840}
+.br-tab{height:28px;display:flex;align-items:center;gap:7px;padding:0 12px;background:#fff;border-radius:7px 7px 0 0;
+  font-size:11.5px;max-width:260px;border:1px solid #D9E0EA;border-bottom:none;position:relative;top:1px}
+.br-tab .fv{width:12px;height:12px;border-radius:3px;background:var(--ink)}
+.br-new{margin:0 0 3px 8px;color:var(--muted);display:flex;align-items:center}
+.br-o{height:42px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);background:#fff}
+.br-nv{display:flex;gap:12px;color:#94A3B8}
+.addr{flex:1;height:28px;border-radius:14px;background:#F1F5F9;display:flex;align-items:center;gap:7px;padding:0 12px;font-size:11.5px;color:var(--muted)}
+.addr b{font-weight:400;color:var(--ink)}
+.br-page{flex:1;position:relative;overflow:hidden;background:#fff}
+.pg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:48px}
+.pg .gl{width:34px;height:34px;border-radius:50%;background:var(--ink)}
+.pg h4{font-size:16px;font-weight:700;margin-top:16px}
+.pg .f{width:300px;margin-top:18px;display:flex;flex-direction:column;gap:12px}
+.pg .pl{font-size:11px;color:var(--muted);margin-bottom:5px}
+.pg .pi{height:32px;border:1px solid #D9E0EA;border-radius:7px;background:#FAFCFE;display:flex;align-items:center;padding:0 10px;font-size:12px}
+.pg .pi.fill{color:var(--ink);font-family:var(--mono);letter-spacing:1.5px}
+.pg .pi.focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.14);background:#fff}
+.pg .pb{height:32px;border-radius:7px;background:#1F883D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-top:4px}
+.dash{position:absolute;border:1.5px dashed var(--blue);border-radius:8px;pointer-events:none}
+.cm{position:absolute;width:200px;background:rgba(255,255,255,.97);backdrop-filter:blur(20px) saturate(1.8);
+  border-radius:10px;border:1px solid rgba(15,23,42,.1);padding:5px;font-size:12.5px;
+  box-shadow:0 14px 36px -8px rgba(15,23,42,.34),0 2px 6px rgba(15,23,42,.1);z-index:5}
+.cm i{display:flex;align-items:center;gap:8px;height:26px;padding:0 9px;border-radius:6px;font-style:normal;color:var(--ink)}
+.cm i.dim{color:#94A3B8}
+.cm i.hi{background:var(--blue);color:#fff}
+.cm i .arw{margin-left:auto;color:#94A3B8;display:flex}
+.cm i.hi .arw{color:#fff}
+.cm hr{border:none;height:1px;background:rgba(15,23,42,.09);margin:4px 8px}
+.cm2{position:absolute;width:220px;background:#fff;border-radius:10px;border:1px solid rgba(15,23,42,.1);padding:5px;
+  box-shadow:0 14px 36px -8px rgba(15,23,42,.34);z-index:6}
+.cm2 .hd{font-size:9.5px;font-weight:600;color:#94A3B8;letter-spacing:.06em;padding:5px 9px 4px}
+.cm2 .en{display:flex;align-items:center;gap:8px;height:28px;padding:0 9px;border-radius:6px;color:var(--ink)}
+.cm2 .en.hi{background:var(--blue);color:#fff}
+.cm2 .en .av{width:18px;height:18px;border-radius:5px;font-size:8.5px}
+.cm2 .en.hi .av{background:rgba(255,255,255,.2);color:#fff}
+.cm2 .en .u{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm2 .en .t{margin-left:auto;font-size:10px;color:#94A3B8;flex:none}
+.cm2 .en.hi .t{color:rgba(255,255,255,.72)}
+.cm2 hr{border:none;height:1px;background:rgba(15,23,42,.09);margin:4px 8px}
+.cm2 .en .kbd{margin-left:auto;font-size:10px;color:#94A3B8;border:1px solid var(--line);border-radius:4px;padding:1px 4px}
+
+/* ========== 06 保存提示 ========== */
+.sv{width:840px;height:520px;position:relative;overflow:hidden;border-radius:14px;
+  border:1px solid rgba(15,23,42,.08);box-shadow:0 16px 40px -14px rgba(15,23,42,.22);
+  background:linear-gradient(155deg,#DCE6F3 0%,#EAF0F8 46%,#E3ECF6 100%)}
+.sv .gh{position:absolute;left:52px;top:46px;width:470px;height:330px;border-radius:12px;background:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.85);box-shadow:0 10px 30px -16px rgba(15,23,42,.35)}
+.sv .lines{position:absolute;left:52px;top:46px;width:470px;height:330px;border-radius:12px;
+  background:repeating-linear-gradient(0deg,rgba(15,23,42,.05) 0 1px,transparent 1px 34px);opacity:.6}
+.sp{position:absolute;right:28px;bottom:28px;width:344px;background:#fff;border-radius:14px;overflow:hidden;
+  box-shadow:0 22px 56px -14px rgba(15,23,42,.42),0 2px 6px rgba(15,23,42,.1)}
+.sp-h{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}
+.sp-h .av{width:30px;height:30px;border-radius:9px;font-size:10.5px}
+.sp-h .tt{font-size:13.5px;font-weight:700}
+.sp-h .sd{font-size:10.5px;color:#94A3B8;margin-top:2px;font-family:var(--mono)}
+.sp-h .x{margin-left:auto;color:#94A3B8;display:flex}
+.sp-r{display:flex;align-items:center;gap:8px;height:34px;margin:0 14px;border-bottom:1px solid var(--line-2)}
+.sp-r .lb{font-size:10.5px;color:#94A3B8;width:38px;flex:none}
+.sp-r .v{font-family:var(--mono);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-r .dots2{font-family:var(--mono);font-size:12px;letter-spacing:2px}
+.sp-r .eye{margin-left:auto;color:#94A3B8;display:flex}
+.sp-tags{display:flex;gap:6px;padding:12px 14px 2px}
+.sp-f{display:flex;gap:7px;padding:12px 14px 10px}
+.sp-f .btn{height:34px;font-size:12.5px}
+.sp-f .btn-p{flex:1}
+.sp-n{font-size:10px;color:#94A3B8;padding:0 14px 12px;display:flex;align-items:center;gap:5px}
+
+/* ========== 07 设置（严格对齐原稿几何） ========== */
+.st{width:670px;height:640px;padding:0;position:relative;background:var(--bg)}
+.st h2{position:absolute;left:28px;top:26px;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.st .intro{position:absolute;left:28px;top:60px;font-size:12px;color:var(--muted)}
+.panel{position:absolute;left:28px;top:100px;width:614px;height:430px;background:#fff;border-radius:14px;
+  padding:20px;display:flex;flex-direction:column}
+.srow{height:62px;flex:none;display:flex;align-items:center;width:100%}
+.srow .info{width:400px;flex:none;display:flex;flex-direction:column;gap:4px}
+.srow .info b{font-size:13px;font-weight:700}
+.srow .info span{font-size:11px;color:var(--muted)}
+.srow .grow{flex:1}
+.srow .val{font-size:11px;color:var(--blue);font-weight:500}
+.danger{position:absolute;left:28px;top:552px;width:614px;height:48px;background:var(--red-bg);border-radius:10px;
+  display:flex;align-items:center;padding:0 14px}
+.danger b{font-size:11px;font-weight:700;color:var(--red)}
+.danger .grow{flex:1}
+.danger span{font-size:11px;color:var(--red)}
+
+/* only 模式（导出单屏 PNG） */
+body.only{padding:48px;gap:0;justify-content:center;align-items:center;min-height:100vh}
+body.only .cap{display:none}
+body.only .board{display:none}
+body.only .board.show{display:flex}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></symbol>
+<symbol id="i-copy" viewBox="0 0 16 16"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6"/><path d="M10.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v6"/></symbol>
+<symbol id="i-eye" viewBox="0 0 16 16"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z"/><circle cx="8" cy="8" r="1.9"/></symbol>
+<symbol id="i-lock" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></symbol>
+<symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.6v1.6M8 12.8v1.6M2.7 8H1.1m13.8 0h-1.6M4.2 4.2 3.1 3.1m9.8 9.8-1.1-1.1M11.8 4.2l1.1-1.1M4.2 11.8l-1.1 1.1"/></symbol>
+<symbol id="i-finger" viewBox="0 0 16 16"><path d="M3.2 8a4.8 4.8 0 0 1 9.6 0v3M5.4 8a2.6 2.6 0 0 1 5.2 0v4.4M8 5.6v6"/></symbol>
+<symbol id="i-star" viewBox="0 0 16 16"><path d="m8 2.6 1.7 3.5 3.8.5-2.8 2.7.7 3.8L8 11.3l-3.4 1.8.7-3.8L2.5 6.6l3.8-.5L8 2.6Z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3.2v9.6M3.2 8h9.6"/></symbol>
+<symbol id="i-dots" viewBox="0 0 16 16"><circle cx="3.2" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.8" cy="8" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-chev-d" viewBox="0 0 16 16"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></symbol>
+<symbol id="i-chev-r" viewBox="0 0 16 16"><path d="m6.5 4.5 3.5 3.5-3.5 3.5"/></symbol>
+<symbol id="i-x" viewBox="0 0 16 16"><path d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"/></symbol>
+<symbol id="i-check" viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-6.5"/></symbol>
+<symbol id="i-shield" viewBox="0 0 16 16"><path d="M8 1.8 13 3.6v4.2c0 3-2 5.4-5 6.4-3-1-5-3.4-5-6.4V3.6L8 1.8Z"/></symbol>
+<symbol id="i-link" viewBox="0 0 16 16"><path d="M6.4 9.6 9.6 6.4"/><path d="M7.6 4.4 8.8 3.2a2.4 2.4 0 0 1 3.4 3.4l-1.2 1.2"/><path d="M8.4 11.6l-1.2 1.2A2.4 2.4 0 0 1 3.8 9.4l1.2-1.2"/></symbol>
+<symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.4"/></symbol>
+<symbol id="i-back" viewBox="0 0 16 16"><path d="m9.5 4-4 4 4 4"/></symbol>
+<symbol id="i-fwd" viewBox="0 0 16 16"><path d="m6.5 4 4 4-4 4"/></symbol>
+<symbol id="i-reload" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13.2 2.6V5h-2.4"/></symbol>
+<symbol id="i-ext" viewBox="0 0 16 16"><path d="M6.2 2.6h3.6v3h3v3.6h-3v3.2H6.2v-3.2h-3V5.6h3v-3Z"/></symbol>
+<symbol id="i-key" viewBox="0 0 16 16"><circle cx="5.5" cy="10.5" r="3"/><path d="m7.8 8.2 5-5M10.6 3.4l2.2 2.2"/></symbol>
+</defs></svg>
+
+<!-- ================= 01 解锁 ================= -->
+<div class="board" id="b1">
+  <div class="cap"><b>01</b><h2>解锁</h2><p>打开应用的第一屏。主密码 + 触控 ID 双入口，底部写明自动锁定规则。</p></div>
+  <div class="screen lk">
+    <div class="mark"><svg class="ic" style="color:#fff;width:22px;height:22px"><use href="#i-lock"/></svg></div>
+    <h1>解锁密码库</h1>
+    <div class="sub">输入主密码继续</div>
+    <div class="form">
+      <div class="inp focus"><span class="dots" style="font-family:var(--mono);letter-spacing:2.5px;font-size:14px">••••••••••••</span>
+        <span style="margin-left:auto;color:#94A3B8;display:flex"><svg class="ic"><use href="#i-eye"/></svg></span></div>
+      <div class="btn btn-p">解锁</div>
+      <div class="or">或</div>
+      <div class="btn btn-g"><svg class="ic"><use href="#i-finger"/></svg>使用触控 ID 解锁</div>
+    </div>
+    <div class="forgot">忘记主密码？</div>
+    <div class="foot"><svg class="ic" style="width:11px;height:11px"><use href="#i-clock"/></svg>空闲 15 分钟后自动锁定</div>
+  </div>
+</div>
+
+<!-- ================= 02 主界面 ================= -->
+<div class="board" id="b2">
+  <div class="cap"><b>02</b><h2>密码库主界面</h2><p>左栏分类、中栏条目、右栏详情。域名首字母色块做条目识别，选中态用浅蓝底 + 左侧 3px 蓝条。</p></div>
+  <div class="app screen">
+    <!-- 左栏 -->
+    <aside class="sb">
+      <div class="sb-brand">
+        <div class="mark"><svg class="ic" style="color:#fff;width:12px;height:12px"><use href="#i-key"/></svg></div>
+        <b>密钥库</b>
+        <div class="add"><svg class="ic" style="width:12px;height:12px"><use href="#i-plus"/></svg></div>
+      </div>
+      <div class="srch"><svg class="ic" style="width:12px;height:12px"><use href="#i-search"/></svg>搜索<span class="kbd" style="margin-left:auto">⌘K</span></div>
+
+      <div class="sb-lab">分类</div>
+      <div class="ni on"><svg class="ic" style="width:13px;height:13px"><use href="#i-lock"/></svg>全部条目<span class="n">128</span></div>
+      <div class="ni"><svg class="ic" style="width:13px;height:13px"><use href="#i-star"/></svg>收藏<span class="n">12</span></div>
+      <div class="ni"><svg class="ic" style="width:13px;height:13px"><use href="#i-clock"/></svg>最近使用<span class="n">8</span></div>
+      <div class="ni"><svg class="ic" style="width:13px;height:13px"><use href="#i-shield"/></svg>弱密码<span class="dot"></span></div>
+
+      <div class="sb-lab">标签</div>
+      <div class="ni"><span class="tg" style="background:#2563EB"></span>工作<span class="n">42</span></div>
+      <div class="ni"><span class="tg" style="background:#059669"></span>个人<span class="n">31</span></div>
+      <div class="ni"><span class="tg" style="background:#B45309"></span>金融<span class="n">9</span></div>
+      <div class="ni"><span class="tg" style="background:#7C3AED"></span>开发<span class="n">16</span></div>
+
+      <div class="sb-foot">
+        <div class="sb-stat"><svg class="ic" style="width:11px;height:11px"><use href="#i-clock"/></svg>自动锁定 · 12:48</div>
+        <div class="ni"><svg class="ic" style="width:13px;height:13px"><use href="#i-gear"/></svg>设置</div>
+        <div class="ni"><svg class="ic" style="width:13px;height:13px"><use href="#i-lock"/></svg>立即锁定<span class="n">⌘L</span></div>
+      </div>
+    </aside>
+
+    <!-- 列表 -->
+    <section class="list">
+      <div class="lh">
+        <div><div class="t">全部条目</div><div class="s">共 128 条</div></div>
+        <div class="sort">最近使用<svg class="ic" style="width:11px;height:11px"><use href="#i-chev-d"/></svg></div>
+      </div>
+      <div class="rows">
+        <div class="row"><div class="av">GH</div><div><div class="nm">GitHub</div><div class="dm">github.com</div></div><div class="tm">昨天</div></div>
+        <div class="row sel"><div class="av">FI</div><div><div class="nm">Figma</div><div class="dm">figma.com</div></div><div class="tm">2 小时前</div></div>
+        <div class="row"><div class="av">ST</div><div><div class="nm">Stripe 后台</div><div class="dm">dashboard.stripe.com</div></div><div class="tm">3 天前</div></div>
+        <div class="row"><div class="av g">AP</div><div><div class="nm">支付宝</div><div class="dm">alipay.com</div></div><div class="tm">1 周前</div></div>
+        <div class="row"><div class="av">NO</div><div><div class="nm">Notion</div><div class="dm">notion.so</div></div><div class="tm">1 周前</div></div>
+        <div class="row"><div class="av g">AL</div><div><div class="nm">阿里云</div><div class="dm">aliyun.com</div></div><div class="tm">2 周前</div></div>
+        <div class="row"><div class="av">VE</div><div><div class="nm">Vercel</div><div class="dm">vercel.com</div></div><div class="tm">1 个月前</div></div>
+        <div class="row"><div class="av">LI</div><div><div class="nm">Linear</div><div class="dm">linear.app</div></div><div class="tm">1 个月前</div></div>
+        <div class="row"><div class="av g">CF</div><div><div class="nm">Cloudflare</div><div class="dm">dash.cloudflare.com</div></div><div class="tm">2 个月前</div></div>
+        <div class="row"><div class="av g">SL</div><div><div class="nm">Slack</div><div class="dm">keylite.slack.com</div></div><div class="tm">2 个月前</div></div>
+        <div class="row"><div class="av g">WX</div><div><div class="nm">微信公众平台</div><div class="dm">mp.weixin.qq.com</div></div><div class="tm">4 个月前</div></div>
+        <div class="row"><div class="av g">AW</div><div><div class="nm">AWS 控制台</div><div class="dm">console.aws.amazon.com</div></div><div class="tm">5 个月前</div></div>
+      </div>
+    </section>
+
+    <!-- 详情 -->
+    <section class="det">
+      <div class="dt-h">
+        <div class="av">FI</div>
+        <div>
+          <h3>Figma<span style="color:#F59E0B;display:flex"><svg class="ic" style="width:13px;height:13px;fill:currentColor"><use href="#i-star"/></svg></span></h3>
+          <div class="url"><svg class="ic" style="width:11px;height:11px"><use href="#i-link"/></svg>figma.com</div>
+        </div>
+        <div class="acts">
+          <div class="ib"><svg class="ic"><use href="#i-copy"/></svg></div>
+          <div class="ib"><svg class="ic"><use href="#i-dots"/></svg></div>
+        </div>
+      </div>
+
+      <div class="dt-b">
+        <div class="fld">
+          <div class="lb">用户名</div>
+          <div class="v"><span class="mono">liupurui@me.com</span>
+            <div class="cp"><svg class="ic" style="width:12px;height:12px"><use href="#i-copy"/></svg></div></div>
+        </div>
+        <div class="fld">
+          <div class="lb">密码 <span class="tagok">强度：高</span></div>
+          <div class="v"><span class="dots">••••••••••••</span><span class="hint">按住 ⌥ 显示</span>
+            <div class="cp"><svg class="ic" style="width:12px;height:12px"><use href="#i-copy"/></svg></div></div>
+        </div>
+        <div class="fld">
+          <div class="lb">两步验证码</div>
+          <div class="v"><span class="code">482 917</span><span class="ring"></span><span class="hint">24 秒后刷新</span>
+            <div class="cp"><svg class="ic" style="width:12px;height:12px"><use href="#i-copy"/></svg></div></div>
+        </div>
+        <div class="fld">
+          <div class="lb">网址</div>
+          <div class="v"><span style="color:var(--blue)">https://figma.com/login</span></div>
+        </div>
+        <div class="fld" style="border-bottom:none">
+          <div class="lb">备注</div>
+          <div class="v" style="color:var(--muted);font-size:12.5px;line-height:1.6">团队管理员账号，两步验证已开启。改密码后记得同步给设计组。</div>
+        </div>
+        <div class="meta">
+          <div>上次使用<b>2 小时前</b></div>
+          <div>使用次数<b>34 次</b></div>
+          <div>创建于<b>2024-03-12</b></div>
+        </div>
+      </div>
+
+      <div class="dt-f">
+        <div class="btn btn-p"><svg class="ic" style="width:13px;height:13px"><use href="#i-link"/></svg>在浏览器中打开并登录</div>
+        <div class="btn btn-g">复制密码</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= 03 新增条目 ================= -->
+<div class="board" id="b3">
+  <div class="cap"><b>03</b><h2>新增条目</h2><p>弹窗式录入，字段顺序按"先能认出是谁、再能登进去"排。密码框右侧直接给生成入口。</p></div>
+  <div class="screen mod-wrap">
+    <div class="mod-bg"><div class="ghost"></div></div>
+    <div class="mod-dim"></div>
+    <div class="mod">
+      <div class="mod-h"><b>新增条目</b><div class="x"><svg class="ic" style="width:13px;height:13px"><use href="#i-x"/></svg></div></div>
+      <div class="mod-b">
+        <div class="mf">
+          <div class="lb">名称</div>
+          <div class="inp focus">GitHub</div>
+        </div>
+        <div class="mf">
+          <div class="lb">网址</div>
+          <div class="inp"><span class="ph">https://github.com/login</span></div>
+        </div>
+        <div class="mf">
+          <div class="lb">用户名</div>
+          <div class="inp">liupurui@me.com</div>
+        </div>
+        <div class="mf">
+          <div class="lb">密码<span class="gen">生成强密码</span></div>
+          <div class="inp"><span style="font-family:var(--mono);letter-spacing:1.5px">•••••••••••••••</span>
+            <span style="margin-left:auto;color:#94A3B8;display:flex"><svg class="ic" style="width:13px;height:13px"><use href="#i-eye"/></svg></span></div>
+        </div>
+        <div class="mf">
+          <div class="lb">标签</div>
+          <div class="chips">
+            <div class="chip on">工作</div><div class="chip">个人</div><div class="chip">金融</div><div class="chip">开发</div>
+          </div>
+        </div>
+        <div class="mf">
+          <div class="lb">备注</div>
+          <textarea placeholder="可选，例如：团队管理员账号"></textarea>
+        </div>
+      </div>
+      <div class="mod-f">
+        <div class="btn btn-g">取消</div>
+        <div class="btn btn-p">保存</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 04 快速搜索 ================= -->
+<div class="board" id="b4">
+  <div class="cap"><b>04</b><h2>快速搜索 · ⌘⇧Space</h2><p>全局快捷键唤起，不切窗口。回车复制密码、Tab 填入当前网页、⌘↵ 打开并登录。</p></div>
+  <div class="qs">
+    <div class="qs-i">
+      <svg class="ic" style="width:15px;height:15px;color:#94A3B8"><use href="#i-search"/></svg>
+      <span class="q">git</span><span class="caret"></span>
+      <span class="kbd" style="margin-left:auto">esc</span>
+    </div>
+    <div class="qs-l">
+      <div class="qr on"><div class="av">GH</div><div><div class="nm">GitHub</div><div class="dm">liupurui@me.com · github.com</div></div><div class="ac">↵ 复制密码</div></div>
+      <div class="qr"><div class="av">GH</div><div><div class="nm">GitHub · 工作</div><div class="dm">work@keylite.dev · github.com</div></div><div class="ac">昨天</div></div>
+      <div class="qr"><div class="av">GL</div><div><div class="nm">GitLab</div><div class="dm">liupurui · gitlab.com</div></div><div class="ac">3 周前</div></div>
+      <div class="qr"><div class="av">GT</div><div><div class="nm">Gitea</div><div class="dm">liupurui · git.keylite.dev</div></div><div class="ac">2 个月前</div></div>
+    </div>
+    <div class="qs-f"><span><b>↑↓</b> 选择</span><span><b>↵</b> 复制密码</span><span><b>Tab</b> 填入当前网页</span><span><b>⌘↵</b> 打开并登录</span><span class="grow">共 128 条</span></div>
+  </div>
+</div>
+
+<!-- ================= 05 右键菜单 ================= -->
+<div class="board" id="b5">
+  <div class="cap"><b>05</b><h2>浏览器右键 · 一键登录</h2><p>识别到密码框后，右键菜单出现「密钥库」子菜单，按当前网站过滤条目并按最近使用排序。两次点击完成登录。</p></div>
+  <div class="br">
+    <div class="br-t">
+      <div class="br-lt"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
+      <div class="br-tab"><span class="fv"></span>登录 GitHub · GitHub</div>
+      <div class="br-new"><svg class="ic" style="width:12px;height:12px"><use href="#i-plus"/></svg></div>
+    </div>
+    <div class="br-o">
+      <div class="br-nv"><svg class="ic" style="width:13px;height:13px"><use href="#i-back"/></svg><svg class="ic" style="width:13px;height:13px"><use href="#i-fwd"/></svg><svg class="ic" style="width:13px;height:13px"><use href="#i-reload"/></svg></div>
+      <div class="addr"><svg class="ic" style="width:11px;height:11px"><use href="#i-lock"/></svg>github.com/<b>login</b></div>
+      <div class="br-nv"><svg class="ic" style="width:13px;height:13px;color:var(--blue)"><use href="#i-ext"/></svg></div>
+    </div>
+    <div class="br-page">
+      <div class="pg">
+        <div class="gl"></div>
+        <h4>登录 GitHub</h4>
+        <div class="f">
+          <div><div class="pl">用户名或邮箱地址</div><div class="pi ph">liupurui@me.com</div></div>
+          <div><div class="pl">密码</div><div class="pi fill focus">••••••••••</div></div>
+          <div class="pb">登录</div>
+        </div>
+      </div>
+
+      <div class="dash" style="left:430px;top:218px;width:300px;height:32px"></div>
+
+      <div class="cm" style="left:740px;top:250px">
+        <i class="dim">撤销</i>
+        <hr>
+        <i>剪切</i><i>复制</i><i>粘贴</i>
+        <hr>
+        <i class="hi">密钥库<svg class="ic arw" style="width:11px;height:11px"><use href="#i-chev-r"/></svg></i>
+        <i>检查</i>
+      </div>
+
+      <div class="cm2" style="left:936px;top:284px">
+        <div class="hd">github.com · 2 条</div>
+        <div class="en hi"><div class="av">GH</div><div class="u">liupurui@me.com</div><div class="t">2 周前</div></div>
+        <div class="en"><div class="av">GH</div><div class="u">work@keylite.dev</div><div class="t">3 天前</div></div>
+        <hr>
+        <div class="en"><svg class="ic" style="width:13px;height:13px"><use href="#i-plus"/></svg><div class="u">生成新密码并填入</div></div>
+        <div class="en"><svg class="ic" style="width:13px;height:13px"><use href="#i-search"/></svg><div class="u">搜索其他条目</div><span class="kbd">⌘⇧Space</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 06 保存提示 ================= -->
+<div class="board" id="b6">
+  <div class="cap"><b>06</b><h2>保存提示</h2><p>提交登录表单后右下角浮出，不抢输入焦点。这个网站已存过同类账号时，标题自动变成「更新密码？」。</p></div>
+  <div class="sv">
+    <div class="gh"></div>
+    <div class="lines"></div>
+    <div class="sp">
+      <div class="sp-h">
+        <div class="av">GH</div>
+        <div><div class="tt">保存这条登录？</div><div class="sd">github.com/login</div></div>
+        <div class="x"><svg class="ic" style="width:13px;height:13px"><use href="#i-x"/></svg></div>
+      </div>
+      <div class="sp-r"><div class="lb">账号</div><div class="v">liupurui@me.com</div></div>
+      <div class="sp-r"><div class="lb">密码</div><div class="dots2">••••••••••</div><div class="eye"><svg class="ic" style="width:13px;height:13px"><use href="#i-eye"/></svg></div></div>
+      <div class="sp-tags"><div class="chip on">工作</div><div class="chip">个人</div><div class="chip">+ 标签</div></div>
+      <div class="sp-f"><div class="btn btn-p">保存</div><div class="btn btn-g">不保存</div></div>
+      <div class="sp-n"><svg class="ic" style="width:11px;height:11px"><use href="#i-shield"/></svg>使用主密码加密，只存本机</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 07 设置 ================= -->
+<div class="board" id="b7">
+  <div class="cap"><b>07</b><h2>设置</h2><p>严格沿用原稿几何：670×640 画布、614×430 面板、62px 行高、38×22 开关。仅文案与图标中文化。</p></div>
+  <div class="screen st">
+    <h2>设置</h2>
+    <div class="intro">管理密码库偏好与安全设置</div>
+
+    <div class="panel">
+      <div class="srow">
+        <div class="info"><b>自动锁定</b><span>空闲 15 分钟后自动锁定密码库</span></div>
+        <div class="grow"></div>
+        <div class="tgl"><i></i></div>
+      </div>
+      <div class="srow">
+        <div class="info"><b>默认隐藏密码</b><span>打开条目时以掩码显示密码</span></div>
+        <div class="grow"></div>
+        <div class="tgl"><i></i></div>
+      </div>
+      <div class="srow">
+        <div class="info"><b>多设备同步</b><span>2 分钟前已同步</span></div>
+        <div class="grow"></div>
+        <div class="tgl"><i></i></div>
+      </div>
+      <div class="srow">
+        <div class="info"><b>默认密码长度</b><span>生成新密码时使用</span></div>
+        <div class="grow"></div>
+        <div class="val">24 位</div>
+      </div>
+      <div class="srow">
+        <div class="info"><b>主题</b><span>外观模式</span></div>
+        <div class="grow"></div>
+        <div class="val">跟随系统</div>
+      </div>
+    </div>
+
+    <div class="danger">
+      <b>删除密码库数据</b>
+      <div class="grow"></div>
+      <span>管理 ›</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var m = new URLSearchParams(location.search).get('only');
+  if(!m) return;
+  document.body.classList.add('only');
+  var el = document.getElementById('b'+m);
+  if(el) el.classList.add('show');
+})();
+</script>
+</body>
+</html>

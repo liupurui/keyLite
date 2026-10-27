@@ -1,0 +1,23 @@
+[package]
+name = "keylite-core"
+version = "0.1.0"
+edition = "2021"
+description = "密钥库的核心：加密、存储、生成器、TOTP（不依赖任何 UI 框架，可单测）"
+
+[dependencies]
+aes-gcm = "0.10"
+argon2 = "0.5"
+rand = "0.8"
+rusqlite = { version = "0.32", features = ["bundled"] }
+base64 = "0.22"
+zeroize = { version = "1", features = ["derive"] }
+thiserror = "1"
+hmac = "0.12"
+sha1 = "0.10"
+data-encoding = "2"
+uuid = { version = "1", features = ["v4"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3"

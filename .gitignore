@@ -1,0 +1,7 @@
+node_modules/
+dist/
+target/
+.cargo-home/
+*.log
+.DS_Store
+app/src-tauri/gen/

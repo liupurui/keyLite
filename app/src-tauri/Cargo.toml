@@ -1,0 +1,41 @@
+[package]
+name = "keylite"
+version = "0.1.0"
+description = "密钥库 · 本地加密密码管理工具"
+edition = "2021"
+rust-version = "1.77"
+# 本 crate 有两个二进制（主程序 + 扩展的 Native Messaging 桥），
+# 必须指定默认运行哪个，否则 `cargo run` 会报错。
+default-run = "keylite"
+
+[lib]
+name = "keylite_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "keylite"
+path = "src/main.rs"
+
+# 浏览器扩展的 Native Messaging 桥（Chrome 会以子进程方式拉起它）
+[[bin]]
+name = "keylite-host"
+path = "src/bin/keylite-host.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+keylite-core = { path = "../../core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+zeroize = "1"
+base64 = "0.22"
+
+# macOS 专属：触控 ID（LAContext）+ 登录钥匙串
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = "0.3"
+objc2-local-authentication = { version = "0.3", features = ["LAContext", "LAPublicDefines", "LAError", "block2", "std"] }
+block2 = "0.6"
+security-framework = "3"
