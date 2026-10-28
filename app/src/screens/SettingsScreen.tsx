@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, isTauri, type Settings } from "../lib/api";
 import { IconChevronRight, IconShield } from "../lib/icons";
 import { WipeVaultModal } from "../components/WipeVaultModal";
+import { applyTheme, type ThemePref } from "../lib/theme";
 
 type Props = {
   onBack: () => void;

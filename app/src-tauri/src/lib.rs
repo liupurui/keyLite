@@ -14,8 +14,32 @@ pub struct AppState {
     pub session: Mutex<Option<Key>>,
 }
 
+/// 唤起 / 收起全局搜索窗口
+fn toggle_search(app: &tauri::AppHandle) {
+    use tauri::{Emitter, Manager};
+    let Some(win) = app.get_webview_window("search") else {
+        return;
+    };
+    if win.is_visible().unwrap_or(false) {
+        let _ = win.hide();
+    } else {
+        let _ = win.show();
+        let _ = win.set_focus();
+        let _ = app.emit_to("search", "keylite://search-focus", ());
+    }
+}
+
 pub fn run() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, _shortcut, event| {
+                    if event.state() == tauri_plugin_global_shortcut::ShortcutState::Pressed {
+                        toggle_search(app);
+                    }
+                })
+                .build(),
+        )
         .setup(|app| {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
@@ -28,6 +52,15 @@ pub fn run() {
 
             // 给浏览器扩展用的本机 IPC 通道
             ipc::spawn(app.handle().clone(), dir.join("ipc.sock"));
+
+            // 全局快捷键：⌘⇧Space 唤起搜索窗口
+            {
+                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+                let sc = Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::Space);
+                if let Err(e) = app.global_shortcut().register(sc) {
+                    eprintln!("[keylite] 全局快捷键注册失败（可能被其他应用占用）：{e}");
+                }
+            }
 
             // 菜单栏图标（设置里可关）
             let show_tray = app
@@ -45,6 +78,14 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            // 搜索窗口：失去焦点就收起（像 Spotlight 一样）
+            if window.label() == "search" {
+                if let tauri::WindowEvent::Focused(false) = event {
+                    let _ = window.hide();
+                }
+                return;
+            }
+
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 let app = window.app_handle();
                 if tray::should_hide_on_close(app) {

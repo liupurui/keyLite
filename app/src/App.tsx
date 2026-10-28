@@ -5,6 +5,7 @@ import { Vault } from "./screens/Vault";
 import { QuickSearch } from "./components/QuickSearch";
 import { SavePrompt, type SaveCandidate } from "./components/SavePrompt";
 import { Toast } from "./components/Toast";
+import { applyTheme, watchSystemTheme, type ThemePref } from "./lib/theme";
 
 export default function App() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
@@ -21,7 +22,8 @@ export default function App() {
     try {
       const s = await api.status();
       setStatus(s);
-      if (!s.locked) setSettings(await api.settings());
+      // 设置不含机密，锁定时也读一次：解锁页也要按主题着色
+      setSettings(await api.settings());
     } catch (e) {
       showToast(String(e));
     }
@@ -93,6 +95,13 @@ export default function App() {
     };
   }, [showToast]);
 
+  /* ---------- 主题 ---------- */
+  useEffect(() => {
+    const pref = (settings?.theme ?? "system") as ThemePref;
+    applyTheme(pref);
+    return watchSystemTheme(pref);
+  }, [settings?.theme]);
+
   /* ---------- 自动锁定 ---------- */
   useEffect(() => {
     if (!status || status.locked) return;
@@ -119,6 +128,8 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.shiftKey && e.code === "Space") {
+        // Tauri 下由全局快捷键唤起独立搜索窗口，这里不再处理，避免双触发
+        if (isTauri()) return;
         e.preventDefault();
         setQuickSearch((v) => !v);
       } else if (meta && e.key.toLowerCase() === "l") {

@@ -20,6 +20,16 @@
   --green-bg: #ecfdf5;
   --amber: #b45309;
   --amber-bg: #fffbeb;
+  --ink-3: var(--ink-3);        /* 最浅的文字 */
+  --hover: var(--hover);        /* 行悬停 */
+  --hover-2: var(--hover-2);      /* 控件悬停 */
+  --paper: var(--paper);        /* 底栏 */
+  --toggle-off: var(--toggle-off);
+  --overlay: rgba(15, 23, 42, 0.2);
+  --toast-bg: #0f172a;
+  --toast-ink: #ffffff;
+  --scrollbar: #d6dee9;
+  --scrollbar-hover: #c2cddc;
   --ui: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC",
     "Hiragino Sans GB", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
@@ -73,13 +83,13 @@ button {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6dee9;
+  background: var(--scrollbar);
   border-radius: 8px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c2cddc;
+  background: var(--scrollbar-hover);
   background-clip: content-box;
 }
 ::-webkit-scrollbar-track {
@@ -115,12 +125,12 @@ button {
   background: var(--blue-d);
 }
 .btn-g {
-  background: #fff;
+  background: var(--panel);
   color: var(--ink);
   border: 1px solid var(--line);
 }
 .btn-g:hover:not(:disabled) {
-  background: #f8fafc;
+  background: var(--hover);
 }
 .btn-danger {
   background: var(--red);
@@ -148,7 +158,7 @@ button {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--panel);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -171,7 +181,7 @@ button {
   font-size: 13px;
 }
 .inp input::placeholder {
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 .inp .mono {
   font-family: var(--mono);
@@ -188,12 +198,12 @@ button {
   border: 1px solid transparent;
 }
 .icon-btn:hover {
-  background: #f1f5f9;
+  background: var(--hover-2);
   color: var(--ink);
 }
 .icon-btn.boxed {
   border-color: var(--line);
-  background: #fff;
+  background: var(--panel);
 }
 
 .avatar {
@@ -212,7 +222,7 @@ button {
   font-size: 10px;
 }
 .avatar.g {
-  background: #f1f5f9;
+  background: var(--hover-2);
   color: var(--muted);
 }
 
@@ -228,25 +238,25 @@ button {
   transition: background 0.15s;
 }
 .toggle.off {
-  background: #cbd5e1;
+  background: var(--toggle-off);
   justify-content: flex-start;
 }
 .toggle i {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--panel);
   display: block;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
 }
 
 .kbd {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
   border: 1px solid var(--line);
   border-radius: 5px;
   padding: 1px 5px;
-  background: #fff;
+  background: var(--panel);
   font-family: var(--ui);
 }
 
@@ -259,11 +269,11 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 0 10px;
-  background: #fff;
+  background: var(--panel);
   transition: all 0.12s;
 }
 .chip:hover {
-  border-color: #cbd5e1;
+  border-color: var(--toggle-off);
 }
 .chip.on {
   background: var(--blue-tint);
@@ -324,7 +334,7 @@ button {
   align-items: center;
   gap: 10px;
   margin: 4px 0;
-  color: #94a3b8;
+  color: var(--ink-3);
   font-size: 11px;
 }
 .gate .or::before,
@@ -338,7 +348,7 @@ button {
   position: absolute;
   bottom: 26px;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--ink-3);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -396,7 +406,7 @@ button {
 .app {
   display: flex;
   height: 100%;
-  background: #fff;
+  background: var(--panel);
 }
 
 .sidebar {
@@ -435,27 +445,27 @@ button {
   height: 22px;
   border-radius: 6px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--panel);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--muted);
 }
 .sb-brand .add:hover {
-  background: #f8fafc;
+  background: var(--hover);
   color: var(--ink);
 }
 .srch {
   height: 32px;
   border-radius: 8px;
   background: var(--bg);
-  border: 1px solid #e8eef7;
+  border: 1px solid var(--line);
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 0 9px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 .srch input {
   flex: 1;
@@ -469,7 +479,7 @@ button {
 .sb-lab {
   font-size: 10.5px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--ink-3);
   letter-spacing: 0.06em;
   padding: 16px 8px 6px;
 }
@@ -486,12 +496,12 @@ button {
   text-align: left;
 }
 .ni:hover {
-  background: #f1f5f9;
+  background: var(--hover-2);
 }
 .ni .n {
   margin-left: auto;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 .ni.on {
@@ -523,7 +533,7 @@ button {
 }
 .sb-stat {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
   padding: 0 8px 8px;
   display: flex;
   align-items: center;
@@ -554,7 +564,7 @@ button {
 }
 .lh .s {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--ink-3);
   margin-top: 2px;
 }
 .lh .sort {
@@ -582,7 +592,7 @@ button {
   text-align: left;
 }
 .row:hover {
-  background: #f8fafc;
+  background: var(--hover);
 }
 .row .nm {
   font-size: 12.5px;
@@ -593,7 +603,7 @@ button {
 }
 .row .dm {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--ink-3);
   margin-top: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -603,7 +613,7 @@ button {
 .row .tm {
   margin-left: auto;
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
   flex: none;
 }
@@ -705,7 +715,7 @@ button {
 }
 .hint {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 .tagok {
   font-size: 10px;
@@ -745,7 +755,7 @@ button {
 }
 .meta div {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 .meta div b {
   display: block;
@@ -760,7 +770,7 @@ button {
   border-top: 1px solid var(--line);
   display: flex;
   gap: 8px;
-  background: #fbfcfe;
+  background: var(--paper);
   flex: none;
 }
 .dt-f .btn {
@@ -795,7 +805,7 @@ button {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.2);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -805,7 +815,7 @@ button {
 .modal {
   width: 440px;
   max-height: 88vh;
-  background: #fff;
+  background: var(--panel);
   border-radius: 14px;
   box-shadow: var(--shadow-pop);
   display: flex;
@@ -837,7 +847,7 @@ button {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  background: #fbfcfe;
+  background: var(--paper);
 }
 .mf {
   padding: 9px 0;
@@ -903,7 +913,7 @@ button {
 .qs {
   width: 560px;
   max-height: 60vh;
-  background: #fff;
+  background: var(--panel);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -950,13 +960,13 @@ button {
 }
 .qr .dm {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--ink-3);
   margin-top: 2px;
 }
 .qr .ac {
   margin-left: auto;
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 .qr.on {
   background: var(--blue);
@@ -980,8 +990,8 @@ button {
   padding: 0 15px;
   border-top: 1px solid var(--line);
   font-size: 10.5px;
-  color: #94a3b8;
-  background: #fbfcfe;
+  color: var(--ink-3);
+  background: var(--paper);
 }
 .qs-f b {
   font-weight: 600;
@@ -1008,7 +1018,7 @@ button {
   margin-top: 8px;
 }
 .panel {
-  background: #fff;
+  background: var(--panel);
   border-radius: 14px;
   padding: 20px;
   margin-top: 24px;
@@ -1051,7 +1061,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--panel);
 }
 .seg button {
   padding: 5px 10px;
@@ -1110,8 +1120,8 @@ button {
   left: 50%;
   bottom: 26px;
   transform: translateX(-50%);
-  background: var(--ink);
-  color: #fff;
+  background: var(--toast-bg);
+  color: var(--toast-ink);
   font-size: 12.5px;
   padding: 9px 16px;
   border-radius: 10px;
@@ -1146,7 +1156,7 @@ button {
   right: 20px;
   bottom: 20px;
   width: 344px;
-  background: #fff;
+  background: var(--panel);
   border-radius: 14px;
   overflow: hidden;
   z-index: 70;
@@ -1178,7 +1188,7 @@ button {
 }
 .save-prompt .sp-h .sd {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
   margin-top: 2px;
   font-family: var(--mono);
   max-width: 230px;
@@ -1199,7 +1209,7 @@ button {
 }
 .save-prompt .sp-r .lb {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: var(--ink-3);
   width: 38px;
   flex: none;
 }
@@ -1257,9 +1267,113 @@ button {
 }
 .save-prompt .sp-n {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--ink-3);
   padding: 0 14px 12px;
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+
+/* ============================================================
+   深色主题
+   data-theme 由 lib/theme.ts 设置在 <html> 上：
+   跟随系统时监听 prefers-color-scheme 自动切换
+   ============================================================ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0e1217;
+  --panel: #161b22;
+  --ink: #e6edf3;
+  --muted: #9ba7b4;
+  --ink-3: #6e7b8a;
+  --line: #262d36;
+  --line-2: #1e242c;
+
+  --blue: #3b82f6;
+  --blue-d: #7aa7ff;
+  --blue-tint: #16243c;
+
+  --red: #f87171;
+  --red-bg: #2a1618;
+  --green: #34d399;
+  --green-bg: #10231c;
+  --amber: #fbbf24;
+  --amber-bg: #2a2110;
+
+  --hover: #1c232b;
+  --hover-2: #202832;
+  --paper: #141a20;
+  --toggle-off: #39424e;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --toast-bg: #e6edf3;
+  --toast-ink: #0e1217;
+  --scrollbar: #2b333d;
+  --scrollbar-hover: #3a444f;
+
+  --shadow-pop: 0 24px 60px -16px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* 深色下几处需要单独处理的细节 */
+[data-theme="dark"] .btn-p {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+[data-theme="dark"] .avatar {
+  background: var(--blue-tint);
+  color: var(--blue-d);
+}
+[data-theme="dark"] .avatar.g {
+  background: var(--hover-2);
+  color: var(--muted);
+}
+[data-theme="dark"] .gate .mark,
+[data-theme="dark"] .sb-brand .mark {
+  box-shadow: 0 6px 16px -4px rgba(59, 130, 246, 0.5);
+}
+[data-theme="dark"] .qr.on {
+  background: var(--blue);
+  color: #fff;
+}
+[data-theme="dark"] .row.sel .nm {
+  color: var(--blue-d);
+}
+[data-theme="dark"] .modal,
+[data-theme="dark"] .qs,
+[data-theme="dark"] .save-prompt {
+  border: 1px solid var(--line);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  background-clip: content-box;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+  background-clip: content-box;
+}
+
+/* ============================================================
+   全局搜索窗口（label = search）
+   窗口本身无边框 + 透明，卡片自带圆角与阴影
+   ============================================================ */
+html[data-window="search"],
+html[data-window="search"] body,
+html[data-window="search"] #root {
+  background: transparent;
+  overflow: hidden;
+}
+.qs-window {
+  height: 100%;
+  padding: 10px;
+  display: flex;
+}
+.qs-window .qs {
+  width: 100%;
+  max-height: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  animation: pop 0.12s ease-out;
+}
+.qs-window .qs-l {
+  max-height: none;
 }

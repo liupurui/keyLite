@@ -6,9 +6,11 @@ import { IconSearch } from "../lib/icons";
 type Props = {
   onClose: () => void;
   onPick: (item: ItemSummary) => void;
+  /** true = 作为独立窗口渲染（无遮罩、铺满窗口） */
+  windowMode?: boolean;
 };
 
-export function QuickSearch({ onClose, onPick }: Props) {
+export function QuickSearch({ onClose, onPick, windowMode }: Props) {
   const [q, setQ] = useState("");
   const [items, setItems] = useState<ItemSummary[]>([]);
   const [idx, setIdx] = useState(0);
@@ -18,6 +20,23 @@ export function QuickSearch({ onClose, onPick }: Props) {
     inputRef.current?.focus();
     api.list().then(setItems).catch(() => setItems([]));
   }, []);
+
+  // 独立窗口被 ⌘⇧Space 反复唤起时，重新聚焦并清空输入
+  useEffect(() => {
+    if (!windowMode) return;
+    let un: (() => void) | undefined;
+    import("@tauri-apps/api/event")
+      .then(({ listen }) =>
+        listen("keylite://search-focus", () => {
+          setQ("");
+          inputRef.current?.focus();
+          inputRef.current?.select();
+        })
+      )
+      .then((f) => (un = f))
+      .catch(() => {});
+    return () => un?.();
+  }, [windowMode]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -52,9 +71,8 @@ export function QuickSearch({ onClose, onPick }: Props) {
     }
   };
 
-  return (
-    <div className="qs-wrap" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="qs" onKeyDown={onKeyDown}>
+  const card = (
+    <div className="qs" onKeyDown={onKeyDown}>
         <div className="qs-i">
           <IconSearch size={15} className="muted" />
           <input
@@ -103,7 +121,16 @@ export function QuickSearch({ onClose, onPick }: Props) {
           </span>
           <span className="grow">共 {items.length} 条</span>
         </div>
-      </div>
+    </div>
+  );
+
+  if (windowMode) {
+    return <div className="qs-window">{card}</div>;
+  }
+
+  return (
+    <div className="qs-wrap" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      {card}
     </div>
   );
 }
