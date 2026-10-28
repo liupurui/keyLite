@@ -297,7 +297,7 @@ export function SettingsScreen({ onBack, onToast, onChanged, onLock }: Props) {
                 className={s.theme === v ? "on" : ""}
                 onClick={() => {
                   update({ theme: v });
-                  if (v !== "light") onToast("深色主题将在 M3 提供，当前保持浅色");
+                  applyTheme(v as ThemePref);
                 }}
               >
                 {t}
