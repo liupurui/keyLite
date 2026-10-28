@@ -119,16 +119,12 @@ jobs:
       - name: 前端依赖
         run: cd app && npm ci
 
-      - name: 安装双架构目标（打通用二进制）
-        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
-
       - name: 构建并发布 Release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: app
-          args: --target universal-apple-darwin
           tagName: ${{ github.ref_name }}
           releaseName: "密钥库 Keylite ${{ github.ref_name }}"
           releaseDraft: true
@@ -139,7 +135,7 @@ jobs:
             macOS 上本地优先的账号密码管理工具。数据只存在本机，密码字段 AES-256-GCM 加密，主密码不落盘。
 
             ### 下载
-            `Keylite_*_universal.dmg` —— 通用二进制，Apple 芯片与 Intel 都能跑
+            `Keylite_*.dmg` —— macOS（Apple 芯片）
 
             ### 安装
             1. 打开 dmg，把 Keylite 拖进「应用程序」
