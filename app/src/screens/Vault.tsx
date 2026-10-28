@@ -24,13 +24,15 @@ import { SettingsScreen } from "./SettingsScreen";
 
 type Props = {
   onLock: () => void;
+  /** 设置变更后回传给 App，保证主题/自动锁定用的是同一份数据 */
+  onSettingsChanged?: (s: Settings) => void;
   onToast: (msg: string) => void;
   onQuickSearch: () => void;
 };
 
 type Cat = "all" | "fav" | "recent" | "weak";
 
-export function Vault({ onLock, onToast, onQuickSearch }: Props) {
+export function Vault({ onLock, onToast, onQuickSearch, onSettingsChanged }: Props) {
   const [items, setItems] = useState<ItemSummary[]>([]);
   const [tags, setTags] = useState<[string, number][]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -223,7 +225,10 @@ export function Vault({ onLock, onToast, onQuickSearch }: Props) {
       <SettingsScreen
         onBack={() => setView("vault")}
         onToast={onToast}
-        onChanged={(s) => setSettings(s)}
+        onChanged={(s) => {
+          setSettings(s);
+          onSettingsChanged?.(s);
+        }}
         onLock={onLock}
       />
     );

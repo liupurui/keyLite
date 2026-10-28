@@ -174,7 +174,12 @@ export default function App() {
           }}
         />
       ) : (
-        <Vault onLock={lock} onToast={showToast} onQuickSearch={() => setQuickSearch(true)} />
+        <Vault
+          onLock={lock}
+          onToast={showToast}
+          onQuickSearch={() => setQuickSearch(true)}
+          onSettingsChanged={setSettings}
+        />
       )}
 
       {quickSearch && (
