@@ -127,7 +127,7 @@ jobs:
           projectPath: app
           tagName: ${{ github.ref_name }}
           releaseName: "密钥库 Keylite ${{ github.ref_name }}"
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           releaseBody: |
             ## 密钥库 Keylite ${{ github.ref_name }}
